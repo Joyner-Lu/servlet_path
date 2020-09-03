@@ -34,38 +34,60 @@ public class KMP {
     public static int findStr(String str, String subStr) {
         //char[] chars = str.toCharArray();
         //char[] subChars = subStr.toCharArray();
-        int i = 0;
         //获取前缀数组
+        int i = 0;
         int[] next = getNext(subStr);
         int len = str.length();
         int subLen = subStr.length();
 
         for (int j = 0; j < len; j++) {
+            if ((len - j) < subLen) {
+                //剩余的宽度不足以和子串比较
+                return -1;
+            }
+
             my_count++;
             char c = str.charAt(j);
+            if (i == 0) {
+                char firstChar = subStr.charAt(0);
+                if (c != firstChar) {
+                    continue;
+                }
+                //取下一个字符
+                j++;
+                i++;
+                c = str.charAt(j);
+            }
 
+            //比较剩下的位
             for (; i < subLen; i++) {
+
                 my_count++;
                 char subC = subStr.charAt(i);
-                if (i == 0 && subC != c) {
-                    //第一个字符不匹配，则与主串的下一位比较
-                    break;
-                } else if (subC != c) {
-                    int pos = next[i + 1];
-                    //修改位置
-                    i = pos - 1;
-                    if (i > j) {
-                        return -1;//比较溢出了
+                if (subC != c) {
+                    if (i == 0) {
+                        //取主串的下一个进行比较
+                        break;
                     }
-                    break;
-                } else if (i == (subLen - 1) && subC == c) {
-                    //返回匹配的索引
-                    return j - subLen + 1;
+                    //与主串的当前位进行比较
+                    int pos = next[i + 1];
+                    //修改位置（减2是因为for里面有+1）
+                    i = pos - 2;
+                    continue;
                 } else {
-                    //进行下一位比较
-                    i++;
-                    break;
+
+                    if (i == (subLen - 1)) {
+                        //比较完毕，返回匹配的索引
+                        return j - subLen + 1;
+                    }
+                    //相等进行下一位比较
+                    //取主串的下一个字符
+                    j++;
+                    c = str.charAt(j);
+                    continue;
                 }
+
+
             }
         }
 
@@ -79,7 +101,7 @@ public class KMP {
      * @param substr
      * @return
      */
-    public static int[] getNext(String substr) {
+    private static int[] getNext(String substr) {
         int len = substr.length();
         int[] next = new int[len + 1];
         // 这个i永远只会往前走，而j会随着不匹配而逐渐等于next[j]
@@ -147,7 +169,7 @@ public class KMP {
 
         String s = new String(byteArrayOutputStream.toByteArray());
         //s = "AAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAAC";
-        String targetStr = "AAAAAAAAAB";
+        String targetStr = "keMO";
         char[] source = s.toCharArray();
         int sourceOffset = 0;
         int sourceCount = s.length();
@@ -157,7 +179,9 @@ public class KMP {
         int fromIndex = 0;
         //System.out.println(s);
         long start = System.currentTimeMillis();
-        System.out.println("位置indexOf：" + s.indexOf(targetStr));
+        System.out.println("位置indexOf：" + indexOf(source, sourceOffset, sourceCount,
+        target, targetOffset, targetCount,
+        fromIndex));
         long end = System.currentTimeMillis();
         System.out.println(end - start);
 
@@ -165,9 +189,9 @@ public class KMP {
         System.out.println("位置findStr：" + findStr(s, targetStr));
         end = System.currentTimeMillis();
         System.out.println(end - start);
-       /* int pos = findStr("ABCDEFD", "EF");
+        /*int pos = findStr("ABCDEFDMNEFXT", "DEF");
         System.out.println(pos);
-        System.out.println("ABCDEFD".indexOf("EF"));*/
+        System.out.println("ABCDEFDMNEFXT".indexOf("DEF"));*/
         //indexOf("ABCDEFDMNEFXT".toCharArray(), 0, "ABCDEFDMNEFXT".length(), "EFX".toCharArray(), 0, "EFX".length(), 0);
         System.out.println("my_count:" + my_count);
         System.out.println("they_count:" + they_count);
