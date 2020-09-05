@@ -96,6 +96,20 @@ public class KMP {
 
         return -1;
     }
+    /**
+     * 查询是否subBytes存在于bytes中，如果存在，则返回匹配的最后一个beyte的index的值
+     *
+     * @param bytes
+     * @param subBytes
+     * @return 返回-1表示未查询掉
+     */
+    public static int indexOfLastByte(byte[] bytes, byte[] subBytes, int fromIndex) {
+        int index = indexOfByte(bytes, subBytes, fromIndex);
+        if (index != -1) {
+            return index + subBytes.length - 1;
+        }
+        return -1;
+    }
 
     /**
      * 查询是否subBytes存在于bytes中，如果存在，则返回匹配的第一个index的值
@@ -104,19 +118,20 @@ public class KMP {
      * @param subBytes
      * @return 返回-1表示未查询掉
      */
-    public static int indexOfByte(byte[] bytes, byte[] subBytes) {
+    public static int indexOfByte(byte[] bytes, byte[] subBytes, int fromIndex) {
+        int len = bytes.length;
+        int subLen = subBytes.length;
 
-        if (bytes.length < 1 || subBytes.length < 1 || subBytes.length > bytes.length) {
+        if (bytes.length < 1 || subBytes.length < 1 || subBytes.length > bytes.length || (len - fromIndex) < subLen) {
             return -1;
         }
 
         //获取前缀数组
         int i = 0;
         int[] next = getNext(subBytes);
-        int len = bytes.length;
-        int subLen = subBytes.length;
 
-        for (int j = 0; j < len; j++) {
+
+        for (int j = fromIndex; j < len; j++) {
             if ((len - j) < subLen) {
                 //剩余的宽度不足以和子串比较
                 return -1;
@@ -250,16 +265,17 @@ public class KMP {
 
     public static void main(String[] args) throws Exception {
 
-
-        testGetNext();
+        testByte();
+        //testGetNext();
 
     }
 
 
     private static void testByte() throws Exception {
-        byte[] subBytes = new byte[]{7,2};
-        byte[] bytes = new byte[]{7};
-        int i = indexOfByte(bytes, subBytes);
+        byte[] bytes = new byte[]{3,7,2,8,7};
+        byte[] subBytes = new byte[]{2,8};
+
+        int i = indexOfByte(bytes, subBytes, 2);
         System.out.println(i);
 
     }
