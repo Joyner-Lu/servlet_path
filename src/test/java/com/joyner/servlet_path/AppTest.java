@@ -4,6 +4,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Unit test for simple App.
  */
@@ -26,11 +32,9 @@ public class AppTest {
         assertTrue(true);
     }
 
-    public static void main(String[] args) {
-        System.out.println("============");
-        System.out.println(CR);
-        System.out.println(LF);
-        System.out.println("============");
+    public static void main(String[] args)throws Exception {
+
+        ByteBuffer headerBuffer = ByteBuffer.allocate(104857600);
 
     }
 }

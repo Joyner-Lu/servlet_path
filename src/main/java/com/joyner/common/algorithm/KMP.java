@@ -1,9 +1,6 @@
 package com.joyner.common.algorithm;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -294,34 +291,7 @@ public class KMP {
     }
 
     private static void testStr() throws Exception {
-        FileInputStream fileInputStream = new FileInputStream("D:\\gitSpace\\servlet_path\\src\\main\\resources\\sfz_zm_data");
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(fileInputStream.available());
-        byteArrayOutputStream.write(fileInputStream);
 
-        String s = new String(byteArrayOutputStream.toByteArray());
-        s = "AAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAXAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAAdAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACAAAAAAAAACds";
-        String targetStr = "AAAAAAAAACds";
-        char[] source = s.toCharArray();
-        int sourceOffset = 0;
-        int sourceCount = s.length();
-        char[] target = targetStr.toCharArray();
-        int targetOffset = 0;
-        int targetCount = targetStr.length();
-        int fromIndex = 0;
-        //System.out.println(s);
-        long start = System.currentTimeMillis();
-        System.out.println("位置indexOf：" + s.indexOf(targetStr));
-        long end = System.currentTimeMillis();
-        System.out.println(end - start);
-
-        start = System.currentTimeMillis();
-        System.out.println("位置findStr：" + indexOfStr(s, targetStr));
-        end = System.currentTimeMillis();
-        System.out.println(end - start);
-        /*int pos = findStr("ABCDEFDMNEFXT", "DEF");
-        System.out.println(pos);
-        System.out.println("ABCDEFDMNEFXT".indexOf("DEF"));*/
-        //indexOf("ABCDEFDMNEFXT".toCharArray(), 0, "ABCDEFDMNEFXT".length(), "EFX".toCharArray(), 0, "EFX".length(), 0);
     }
 
 }

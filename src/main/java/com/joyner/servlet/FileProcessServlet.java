@@ -2,18 +2,12 @@ package com.joyner.servlet;
 
 import com.joyner.common.algorithm.KMP;
 import com.joyner.entity.FileItemEntity;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.plaf.synth.SynthOptionPaneUI;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -66,33 +60,8 @@ public class FileProcessServlet extends HttpServlet {
             System.out.println("item:" + item);
         }
 
-        boolean isMultipart = ServletFileUpload.isMultipartContent(req);
 
-
-        // Create a factory for disk-based file items
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-
-// Configure a repository (to ensure a secure temp location is used)
-        ServletContext servletContext = this.getServletConfig().getServletContext();
-        File repository = (File) servletContext.getAttribute("javax.servlet.context.tempdir");
-        factory.setRepository(repository);
-
-// Create a new file upload handler
-        ServletFileUpload upload = new ServletFileUpload(factory);
-
-// Parse the request
-       /* try {
-            List<FileItem> items = upload.parseRequest(req);
-            for (FileItem item : items) {
-                if (!item.isFormField()) {
-                    FileOutputStream fileOutputStream = new FileOutputStream("D:/" + item.getName());
-                    fileOutputStream.write(item.get());
-                }
-            }
-        } catch (Exception ex) {
-            System.out.println("fdfsd");
-        }*/
-        FileInputStream fileInputStream = new FileInputStream("C:\\Users\\62358\\Desktop\\指令.png");
+        /*FileInputStream fileInputStream = new FileInputStream("C:\\Users\\62358\\Desktop\\指令.png");
         System.out.println(fileInputStream.available());
 
         rawProcess(req, resp);
@@ -104,7 +73,7 @@ public class FileProcessServlet extends HttpServlet {
                 fileInputStream.close();
             }
         }
-
+*/
     }
 
     private void rawProcess(HttpServletRequest req, HttpServletResponse resp) {
@@ -150,37 +119,34 @@ public class FileProcessServlet extends HttpServlet {
         int index = KMP.indexOfByte(itemBytes, crLfBytes, fromIndex);
         int i = 0;
         while (index != -1) {
-
-            if (beginReadContent) {
-                //开始读取内容
-                byte[] bytes = Arrays.copyOfRange(itemBytes, fromIndex, itemBytes.length - CR_LF_LEN);
-                fileItem.setItemBytes(bytes);
-            } else {
-                byte[] bytes = Arrays.copyOfRange(itemBytes, fromIndex, index);
-                //读取其他信息
-                if (i == 0) {
-                    //读取Content-Disposition: form-data; name="lastname"
-                    String contentDisposition = new String(bytes);
-                    String[] contentDispositionArr = contentDisposition.split(";");
-                    fileItem.setFieldName(contentDispositionArr[1].split("=")[1].replaceAll("\"", ""));
-                    if (contentDispositionArr.length > 2) {
-                        fileItem.setFormField(false);
-                        fileItem.setFileName(contentDispositionArr[2].split("=")[1].replaceAll("\"", ""));
-                    }
-                } else if (i == 1 && fromIndex != index) {
-                    //获取content-type
-                    String contentType = new String(bytes);
-                    String type = contentType.split(":")[1];
-                    fileItem.setContentType(type.trim());
+            byte[] bytes = Arrays.copyOfRange(itemBytes, fromIndex, index);
+            //读取其他信息
+            if (i == 0) {
+                //读取Content-Disposition: form-data; name="lastname"
+                String contentDisposition = new String(bytes);
+                String[] contentDispositionArr = contentDisposition.split(";");
+                fileItem.setFieldName(contentDispositionArr[1].split("=")[1].replaceAll("\"", ""));
+                if (contentDispositionArr.length > 2) {
+                    fileItem.setFormField(false);
+                    fileItem.setFileName(contentDispositionArr[2].split("=")[1].replaceAll("\"", ""));
                 }
+            } else if (i == 1 && fromIndex != index) {
+                //获取content-type
+                String contentType = new String(bytes);
+                String type = contentType.split(":")[1];
+                fileItem.setContentType(type.trim());
             }
 
             if (fromIndex == index) {
-                //中间那个间隔到了
-                beginReadContent = true;
+                //开始直接读取内容，并结束
+                bytes = Arrays.copyOfRange(itemBytes, fromIndex + CR_LF_LEN, itemBytes.length - CR_LF_LEN);
+                fileItem.setItemBytes(bytes);
+                index = -1;
+            } else {
+                fromIndex = index + CR_LF_LEN;
+                index = KMP.indexOfByte(itemBytes, crLfBytes, fromIndex);
             }
-            fromIndex = index + CR_LF_LEN;
-            index = KMP.indexOfByte(itemBytes, crLfBytes, fromIndex);
+
             i++;
         }
 
